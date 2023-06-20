@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'workspace', defaultValue: 'Development', description:'workspace to use in Terraform')
+    }
+
+    environment {
+
+        TF_INPUT = "0"
+        TF_IN_AUTOMATION = "TRUE"
+        TF_LOG = "WARN"
+        AWS_ACCESS_KEY_ID = credentials('aws_access_key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
+
+    }
+
+    stages {
+        stage('Init'){
+            steps {
+                sh 'terraform --version'
+                sh "terraform init -input=false"
+            }
+        }
+    }
+}
