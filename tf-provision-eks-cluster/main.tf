@@ -6,7 +6,7 @@ resource "random_string" "suffix" {
 locals {
   name_prefix         = "${var.naming_prefix}-${terraform.workspace}"
   name_prefix_project = var.naming_prefix_project
-  cluster_name        = lower("${local.name_prefix}-eks-${random_string.suffix.result}")
+  cluster_name        = lower("${local.name_prefix}-eks-${var.project}-${random_string.suffix.result}")
 }
 
 module "tags" {
@@ -37,4 +37,17 @@ module "eks" {
   private_subnet_ids  = module.networking.private_subnet_ids
   public_subnet_ids   = module.networking.public_subnet_ids
   instance_types      = ["t3.medium"]
+}
+
+module "database" {
+  source             = "./modules/database"
+  availability_zones = ["eu-west-3a", "eu-west-3b", "eu-west-3c"]
+  cluster_identifier = local.name_prefix_project
+  database_name      = local.name_prefix_project
+  engine_version     = "15.2"
+  instance_class     = "db.r5.large"
+  master_username    = local.name_prefix_project
+  private_subnet_ids = module.networking.private_subnet_ids
+  vpc_id             = module.networking.vpc_id
+  tags               = module.tags.tags
 }
