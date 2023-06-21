@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'workspace', defaultValue: 'Development', description:'workspace to use in Terraform')
+        string(name: 'aws_region', defaultValue: 'eu-west-3', description:'Region for AWS Resources')
+        string(name: 'naming_prefix', defaultValue: 'EU', description:'Naming prefix for resources')
+        string(name: 'company', defaultValue: 'Jumia', description:'Company name for resource tagging')
+        string(name: 'environment', defaultValue: 'Development', description:'Application environment for deployment')
+        string(name: 'naming_prefix_project', defaultValue: 'EU-DEV-Jumia-Hexa', description:'Full identification')
+        string(name: 'project', defaultValue: 'Hexa', description:'Project name')
+        string(name: 'application', defaultValue: 'phone-validator', description:'Application name')
+        string(name: 'billing_code', defaultValue: 'ACCT8675309', description:'Billing code for resource tagging') 
+        string(name: 'aws_account_id', defaultValue: '', description:'')
+    }  
+
+    environment {
+        TF_INPUT = "0"
+        TF_IN_AUTOMATION = "TRUE"
+        TF_LOG = "WARN"
+        AWS_ACCESS_KEY_ID = credentials('aws_access_key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
+    }
+
+    stages {
+        stage('Init'){
+            steps {
+                 dir('tf-provision-eks-cluster/'){
+                    sh 'terraform --version'
+                    sh "terraform init"
+                    sh "terraform fmt"
+                 }
+            }
+        }
+        stage('Validate'){
+            steps {
+                dir('tf-provision-eks-cluster/'){
+                    sh 'terraform validate'
+                }
+            }
+        }
+        stage('Plan'){
+            steps {
+                dir('tf-provision-eks-cluster/'){
+                    script {
+                        try {
+                            sh "terraform workspace new ${params.workspace}"
+                        } catch (err) {
+                            sh "terraform workspace select ${params.workspace}"
+                        }
+                        sh "terraform plan -var=aws_region=${params.aws_region} -var=naming_prefix=${params.naming_prefix} -var=company=${params.company} -var=environment=${params.environment} -var=naming_prefix_project=${params.naming_prefix_project} -var=project=${params.project} -var=application=${params.application} -var=billing_code=${params.billing_code} -var=aws_account_id=${params.aws_account_id} -out eks-${params.workspace}.tfplan;echo \$? > status"
+
+                        stash name: "eks-${params.workspace}-plan", includes: "eks-${params.workspace}.tfplan"
+                    }
+                }
+            }
+        }
+        
+        stage('Apply'){
+            steps {
+                dir('tf-provision-eks-cluster/'){ 
+                    script{
+                        def apply = false
+                        try {
+                            input message: 'confirm apply', ok: 'Apply Config'
+                            apply = true
+                        } catch (err) {
+                            apply = false
+
+                            sh "terraform destroy -auto-approve"
+
+                            currentBuild.result = 'UNSTABLE'
+                        }
+                        if(apply){
+                            unstash "eks-${params.workspace}-plan"
+                            sh "terraform apply eks-${params.workspace}.tfplan"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
