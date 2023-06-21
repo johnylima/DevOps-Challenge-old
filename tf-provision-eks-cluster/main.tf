@@ -8,7 +8,6 @@ locals {
   name_prefix_project = var.naming_prefix_project
   cluster_name        = lower("${local.name_prefix}-eks-${var.project}-${random_string.suffix.result}")
 }
-
 module "tags" {
   source       = "./modules/tags"
   company      = var.company
@@ -42,11 +41,12 @@ module "eks" {
 module "database" {
   source             = "./modules/database"
   availability_zones = ["eu-west-3a", "eu-west-3b", "eu-west-3c"]
-  cluster_identifier = local.name_prefix_project
-  database_name      = local.name_prefix_project
+  cluster_identifier = lower("${local.name_prefix}-cluster-${random_string.suffix.result}")
+  identifier         = lower("${local.name_prefix}-${var.project}")
+  database_name      = lower(replace("${var.company}${var.application}", "-", ""))
   engine_version     = "15.2"
   instance_class     = "db.r5.large"
-  master_username    = local.name_prefix_project
+  master_username    = lower("${var.company}")
   private_subnet_ids = module.networking.private_subnet_ids
   vpc_id             = module.networking.vpc_id
   tags               = module.tags.tags
