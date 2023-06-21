@@ -8,6 +8,7 @@ locals {
   name_prefix_project = var.naming_prefix_project
   cluster_name        = lower("${local.name_prefix}-eks-${var.project}-${random_string.suffix.result}")
 }
+
 module "tags" {
   source       = "./modules/tags"
   company      = var.company
