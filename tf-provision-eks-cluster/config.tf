@@ -3,10 +3,14 @@
 ##################################################################################
 
 provider "aws" {
-  region = var.aws_region
-  assume_role {
+  region     = var.aws_region
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+  /*
+   assume_role {
     role_arn = "arn:aws:iam::${var.aws_account_id}:role/CICDProvisioner"
   }
+  */
 }
 
 ##################################################################################
@@ -16,8 +20,8 @@ provider "aws" {
 terraform {
   /*
   backend "s3" {
-    bucket         = "eu-jumia-hexa-tfstate"
-    dynamodb_table = "eu-jumia-hexa-tfstate"
+    bucket         = "eu-jumia-jlhexa-tfstate"
+    dynamodb_table = "eu-jumia-jlhexa-tfstate"
     region         = "eu-west-3"
     key            = "main.tfstate"
     profile        = "default"
@@ -27,7 +31,7 @@ terraform {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "eu-jumia-hexa-tfstate"
+  bucket = "eu-jumia-jlhexa-tfstate"
   lifecycle {
     prevent_destroy = false
   }
@@ -41,7 +45,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
 }
 
 resource "aws_dynamodb_table" "terraform_state" {
-  name           = "eu-jumia-hexa-tfstate"
+  name           = "eu-jumia-jlhexa-tfstate"
   hash_key       = "LockID"
   read_capacity  = 1
   write_capacity = 1
