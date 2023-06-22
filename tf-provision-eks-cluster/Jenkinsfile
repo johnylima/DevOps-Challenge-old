@@ -74,8 +74,8 @@ pipeline {
                             currentBuild.result = 'UNSTABLE'
                         }
                         if(apply){
-                            unstash "eks-${params.workspace}-plan"
-                            sh "terraform apply eks-${params.workspace}.tfplan"
+                            unstash "eks-jlhexa-${params.workspace}-plan"
+                            sh "terraform apply eks-jlhexa-${params.workspace}.tfplan"
                         }
                     }
                 }
