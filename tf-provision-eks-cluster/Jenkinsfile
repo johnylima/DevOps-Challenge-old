@@ -43,7 +43,7 @@ pipeline {
                     } catch (err) {
                         sh "terraform workspace select ${params.workspace}"
                     }
-                    sh "terraform plan -var=aws_region=${params.aws_region} -var=naming_prefix=${params.naming_prefix} -var=company=${params.company} -var=environment=${params.environment} -var=naming_prefix_project=${params.naming_prefix_project} -var=project=${params.project} -var=application=${params.application} -var=billing_code=${params.billing_code} -var=aws_account_id=${params.aws_account_id} -var=aws_access_key=${params.aws_access_key} -var=aws_secret_key=${params.aws_secret_key} -out eks-${params.workspace}.tfplan;echo \$? > status"
+                    sh "terraform plan -var=aws_region=${params.aws_region} -var=naming_prefix=${params.naming_prefix} -var=company=${params.company} -var=environment=${params.environment} -var=naming_prefix_project=${params.naming_prefix_project} -var=project=${params.project} -var=application=${params.application} -var=billing_code=${params.billing_code} -var=aws_account_id=${params.aws_account_id} -var=aws_access_key=${params.aws_access_key} -var=aws_secret_key=${params.aws_secret_key} -out eks-jlhexa-${params.workspace}.tfplan;echo \$? > status"
 
                     stash name: "eks-${params.workspace}-plan", includes: "eks-${params.workspace}.tfplan"
                 }
