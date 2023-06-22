@@ -20,8 +20,8 @@ provider "aws" {
 terraform {
   /*
   backend "s3" {
-    bucket         = "eu-jumia-jlhexa-tfstate"
-    dynamodb_table = "eu-jumia-jlhexa-tfstate"
+    bucket         = "eujumiajlhexa-tfstate"
+    dynamodb_table = "eujumiajlhexa-tfstate"
     region         = "eu-west-3"
     key            = "main.tfstate"
     profile        = "default"
@@ -31,7 +31,7 @@ terraform {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "eu-jumia-jlhexa-tfstate"
+  bucket = "eujumiajlhexa-tfstate"
   lifecycle {
     prevent_destroy = false
   }
@@ -45,7 +45,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
 }
 
 resource "aws_dynamodb_table" "terraform_state" {
-  name           = "eu-jumia-jlhexa-tfstate"
+  name           = "eujumiajlhexa-tfstate"
   hash_key       = "LockID"
   read_capacity  = 1
   write_capacity = 1
