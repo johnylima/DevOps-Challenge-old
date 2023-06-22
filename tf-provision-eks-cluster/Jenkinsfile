@@ -67,7 +67,7 @@ pipeline {
                         } catch (err) {
                             apply = false
 
-                            sh "terraform destroy -auto-approve"
+                            sh "terraform destroy -var=aws_region=${params.aws_region} -var=naming_prefix=${params.naming_prefix} -var=company=${params.company} -var=environment=${params.environment} -var=naming_prefix_project=${params.naming_prefix_project} -var=project=${params.project} -var=application=${params.application} -var=billing_code=${params.billing_code} -var=aws_account_id=${params.aws_account_id} -auto-approve"
 
                             currentBuild.result = 'UNSTABLE'
                         }
