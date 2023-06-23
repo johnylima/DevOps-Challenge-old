@@ -69,8 +69,8 @@ pipeline {
         stage('Trigger ManifestUpdate') {
             steps {
                 dir('jumia_phone_validator/validator-frontend/'){ 
-                    echo "triggering updatemanifestjob"
-                    build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                    echo "triggering Phone-Validator updatemanifestjob"
+                    build job: 'Phone-Validator-Update-Manifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
                 }   
             }
         }
