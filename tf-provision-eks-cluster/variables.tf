@@ -4,12 +4,21 @@ variable "aws_account_id" {
   type = string
 }
 
+variable "aws_access_key" {
+  description = "AWS access key"
+  type        = string
+}
+
+variable "aws_secret_key" {
+  description = "AWS secret key"
+  type        = string
+}
+
 variable "aws_region" {
   description = "Region for AWS Resources"
   type        = string
   default     = "eu-west-3"
 }
-
 
 # IDENTIFICATION #
 variable "naming_prefix" {
