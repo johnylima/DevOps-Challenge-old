@@ -2,9 +2,9 @@ def app
 
 pipeline {
   agent any
-    
-  tools {nodejs "node"}
- 
+
+  tools {maven "Maven 3.8.1"}
+
   stages {
     
         stage('Git') {
@@ -13,29 +13,27 @@ pipeline {
                 }
         }
 
-        stage('Tools & components') {
+       stage('Tools & components') {
             steps {
-                dir('jumia_phone_validator/validator-frontend/'){ 
-                    sh 'node --version'
-                    sh 'npm --version'
+                dir('jumia_phone_validator/validator-backend/'){ 
+                    sh 'mvn --version'
                 }
             }
-        }
-        
-        stage('Install dependencies') {
+        }       
+
+        stage('Clean install') {
             steps {
-                dir('jumia_phone_validator/validator-frontend/'){ 
-                    sh 'npm install'
-                    sh 'npm run build'
+                dir('jumia_phone_validator/validator-backend/'){ 
+                        sh 'mvn clean install'
                     }
                 }
         } 
 
         stage('Build image') {
             steps {
-                dir('jumia_phone_validator/validator-frontend/'){ 
+                dir('jumia_phone_validator/validator-backend/'){ 
                     script {
-                        app = docker.build("johnylima/phone-validator-frontend-2")
+                        app = docker.build("johnylima/phone-validator-backend")
                     }
                 }
             }
@@ -43,7 +41,7 @@ pipeline {
 
         stage('Test image') {
             steps {
-                dir('jumia_phone_validator/validator-frontend/'){ 
+                dir('jumia_phone_validator/validator-backend/'){ 
                     script {
                         app.inside {
                             sh 'echo "Tests passed"'
@@ -56,7 +54,7 @@ pipeline {
 
         stage('Push image') {
             steps {
-                dir('jumia_phone_validator/validator-frontend/'){ 
+                dir('jumia_phone_validator/validator-backend/'){ 
                     script {
                         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                             app.push("${env.BUILD_NUMBER}")
@@ -66,22 +64,5 @@ pipeline {
             }
         } 
 
-        stage('Trigger update Phone-Validator-Manifest') {
-            steps {
-                dir('jumia_phone_validator/validator-frontend/'){ 
-                    echo "triggering Phone-Validator updatemanifestjob"
-                    build job: 'Phone-Validator-Manifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-                }   
-            }
-        }
-
-        stage('Cleanup'){
-            steps {
-                dir('jumia_phone_validator/validator-frontend/'){ 
-                    echo 'cleanup'
-                    sh 'rm node_modules -rf'
-                }
-            }
-        }
   }
 }
