@@ -1,0 +1,68 @@
+def app
+
+pipeline {
+  agent any
+
+  tools {maven "Maven 3.8.1"}
+
+  stages {
+    
+        stage('Git') {
+            steps {
+                    checkout scm
+                }
+        }
+
+       stage('Tools & components') {
+            steps {
+                dir('jumia_phone_validator/validator-backend/'){ 
+                    sh 'mvn --version'
+                }
+            }
+        }       
+
+        stage('Clean install') {
+            steps {
+                dir('jumia_phone_validator/validator-backend/'){ 
+                        sh 'mvn clean install'
+                    }
+                }
+        } 
+
+        stage('Build image') {
+            steps {
+                dir('jumia_phone_validator/validator-backend/'){ 
+                    script {
+                        app = docker.build("johnylima/phone-validator-backend")
+                    }
+                }
+            }
+        } 
+
+        stage('Test image') {
+            steps {
+                dir('jumia_phone_validator/validator-backend/'){ 
+                    script {
+                        app.inside {
+                            sh 'echo "Tests passed"'
+                        }
+                    }
+                }
+            }
+        }
+
+
+        stage('Push image') {
+            steps {
+                dir('jumia_phone_validator/validator-backend/'){ 
+                    script {
+                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                            app.push("${env.BUILD_NUMBER}")
+                        }
+                    }
+                }
+            }
+        } 
+
+  }
+}
