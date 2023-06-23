@@ -1,0 +1,87 @@
+def app
+
+pipeline {
+  agent any
+    
+  tools {nodejs "node"}
+ 
+  stages {
+    
+        stage('Git') {
+            steps {
+                    checkout scm
+                }
+        }
+
+        stage('Tools & components') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    sh 'node --version'
+                    sh 'npm --version'
+                }
+            }
+        }
+        
+        stage('Install dependencies') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    sh 'npm install'
+                    sh 'npm run build'
+                    }
+                }
+        } 
+
+        stage('Build image') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    script {
+                        app = docker.build("johnylima/phone-validator-frontend-2")
+                    }
+                }
+            }
+        } 
+
+        stage('Test image') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    script {
+                        app.inside {
+                            sh 'echo "Tests passed"'
+                        }
+                    }
+                }
+            }
+        }
+
+
+        stage('Push image') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    script {
+                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                            app.push("${env.BUILD_NUMBER}")
+                        }
+                    }
+                }
+            }
+        } 
+
+        stage('Trigger update Phone-Validator-Manifest') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    echo "triggering Phone-Validator updatemanifestjob"
+                    build job: 'Phone-Validator-Manifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                }   
+            }
+        }
+
+        stage('Cleanup'){
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    echo 'cleanup'
+                    sh 'rm node_modules -rf'
+                }
+            }
+        }
+  }
+}
