@@ -64,5 +64,13 @@ pipeline {
             }
         } 
 
+        stage('Trigger update Phone-Validator-Manifest') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    echo "triggering Phone-Validator-Backend-Manifest for updatemanifestjob"
+                    build job: 'Phone-Validator-Backend-Manifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                }   
+            }
+        }
   }
 }
