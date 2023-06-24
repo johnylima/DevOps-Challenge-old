@@ -15,21 +15,11 @@ output "cluster_name" {
   value       = module.eks.cluster_name
 }
 output "cluster_ca_certificate" {
-  value = module.eks.cluster_ca_certificate
+  description = "Cluster ca certificate"
+  value       = module.eks.cluster_ca_certificate
 }
 
-output "endpoint" {
-  value = module.database.endpoint
-}
-
-output "port" {
-  value = module.database.port
-}
-
-output "database_name" {
-  value = module.database.database_name
-}
-
-output "master_username" {
-  value = module.database.master_username
+output "instance_connection_info_RDS" {
+  description = "Object containing connection info RDS"
+  value       = module.database.instance_connection_info_RDS
 }
