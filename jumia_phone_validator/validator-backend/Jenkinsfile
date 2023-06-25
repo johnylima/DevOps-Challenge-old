@@ -3,7 +3,7 @@ def app
 pipeline {
   agent any
 
-  tools {maven "Maven 3.8.1"}
+ // tools {maven "Maven 3.8.1"}
 
   stages {
     
@@ -12,6 +12,19 @@ pipeline {
                     checkout scm
                 }
         }
+
+        stage('Replace variables') {
+            steps {
+                dir('jumia_phone_validator/validator-backend/'){ 
+                    script {
+                        sh "sed -i 's+spring.datasource.url=.*+spring.datasource.url=jdbc:postgresql://${database_url}:${database_port}/${database_name}+g' src/main/resources/application.properties"
+                        sh "sed -i 's+spring.datasource.username=.*+spring.datasource.username=${application_username}+g' src/main/resources/application.properties"
+                        sh "sed -i 's+spring.datasource.password=.*+spring.datasource.password=${application_password}+g' src/main/resources/application.properties"
+                        sh "cat src/main/resources/application.properties"
+                    }
+                }
+            }
+        }  
 
        stage('Tools & components') {
             steps {
@@ -33,7 +46,7 @@ pipeline {
             steps {
                 dir('jumia_phone_validator/validator-backend/'){ 
                     script {
-                        app = docker.build("johnylima/phone-validator-backend")
+                        app = docker.build("johnylima/phone-validator-backend-2")
                     }
                 }
             }
