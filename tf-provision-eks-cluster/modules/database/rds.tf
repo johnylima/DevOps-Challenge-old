@@ -24,11 +24,13 @@ resource "aws_rds_cluster_instance" "this" {
   engine                     = aws_rds_cluster.this.engine
   engine_version             = aws_rds_cluster.this.engine_version
   auto_minor_version_upgrade = false
+  publicly_accessible        = true //"Determines if database can be publicly available (NOT recommended)"
   tags                       = var.tags
 }
 
 resource "aws_db_subnet_group" "this" {
-  subnet_ids = var.private_subnet_ids
+  //subnet_ids = var.private_subnet_ids
+  subnet_ids = var.public_subnet_ids
   tags       = var.tags
 }
 
