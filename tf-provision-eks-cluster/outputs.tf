@@ -19,7 +19,12 @@ output "cluster_ca_certificate" {
   value       = module.eks.cluster_ca_certificate
 }
 
-output "instance_connection_info_RDS" {
+output "connection_info_RDS" {
   description = "Object containing connection info RDS"
-  value       = module.database.instance_connection_info_RDS
+  value       = module.database.connection_info_RDS
+}
+
+output "master_password" {
+  value       = module.database.master_password
+  sensitive = true
 }
