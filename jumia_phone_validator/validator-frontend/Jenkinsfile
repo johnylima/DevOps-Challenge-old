@@ -46,7 +46,7 @@ pipeline {
             steps {
                 dir('jumia_phone_validator/validator-frontend/'){ 
                     script {
-                        app = docker.build("johnylima/phone-validator-frontend-2")
+                        app = docker.build("johnylima/phone-validator-frontend")
                     }
                 }
             }
