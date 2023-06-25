@@ -13,6 +13,17 @@ pipeline {
                 }
         }
 
+        stage('Replace variables') {
+            steps {
+                dir('jumia_phone_validator/validator-frontend/'){ 
+                    script {
+                        sh "sed -i 's+baseURL:.*+baseURL: ${backend_service}+g' src/http-common.js"
+                        sh "cat src/http-common.js"
+                    }
+                }
+            }
+        }  
+
         stage('Tools & components') {
             steps {
                 dir('jumia_phone_validator/validator-frontend/'){ 
