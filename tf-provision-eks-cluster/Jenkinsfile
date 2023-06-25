@@ -7,7 +7,7 @@ pipeline {
         string(name: 'naming_prefix', defaultValue: 'EU', description:'Naming prefix for resources')
         string(name: 'company', defaultValue: 'Jumia', description:'Company name for resource tagging')
         string(name: 'environment', defaultValue: 'Development', description:'Application environment for deployment')
-        string(name: 'naming_prefix_project', defaultValue: 'EU-DEV-Jumia-Hexa', description:'Full identification')
+        string(name: 'naming_prefix_project', defaultValue: 'EU-DEV-Jumia-JLHexa', description:'Full identification')
         string(name: 'project', defaultValue: 'Hexa', description:'Project name')
         string(name: 'application', defaultValue: 'phone-validator', description:'Application name')
         string(name: 'billing_code', defaultValue: 'ACCT8675309', description:'Billing code for resource tagging') 
