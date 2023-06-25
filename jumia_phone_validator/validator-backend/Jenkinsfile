@@ -13,6 +13,19 @@ pipeline {
                 }
         }
 
+        stage('Replace variables') {
+            steps {
+                dir('jumia_phone_validator/validator-backend/'){ 
+                    script {
+                        sh "sed -i 's+spring.datasource.url=.*+spring.datasource.url=jdbc:postgresql://${database_url}:${database_port}/${database_name}+g' src/main/resources/application.properties"
+                        sh "sed -i 's+spring.datasource.username=.*+spring.datasource.username=${application_username}+g' src/main/resources/application.properties"
+                        sh "sed -i 's+spring.datasource.password=.*+spring.datasource.password=${application_password}+g' src/main/resources/application.properties"
+                        sh "cat src/main/resources/application.properties"
+                    }
+                }
+            }
+        }  
+
        stage('Tools & components') {
             steps {
                 dir('jumia_phone_validator/validator-backend/'){ 
