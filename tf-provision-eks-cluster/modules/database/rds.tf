@@ -5,7 +5,7 @@ resource "aws_rds_cluster" "this" {
   availability_zones        = var.availability_zones
   database_name             = var.database_name
   master_username           = var.master_username
-  master_password           = "somepass123" //random_password.this.result
+  master_password           = random_password.this.result
   port                      = "1337"
   backup_retention_period   = 7
   preferred_backup_window   = "03:00-04:00"
